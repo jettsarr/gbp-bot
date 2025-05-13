@@ -63,11 +63,11 @@ export default async function handler(req, res) {
         }))
       : [];
 
-    // Generate proper photo URLs with redirect=true to get actual images
+    // Generate photo URLs through your proxy to properly serve images
     const photos = result?.photos
       ? result.photos.map(photo => ({
           photo_reference: photo.photo_reference,
-          photo_url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo.photo_reference}&key=${apiKey}&redirect=true`,
+          photo_url: `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`,
           height: photo.height,
           width: photo.width
         }))
