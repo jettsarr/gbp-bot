@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
     // Flatten Photos to Simple Direct URLs via Proxy
     const photos = result?.photos
-      ? result.photos.map(photo =>
+      ? result.photos.slice(0, 5).map(photo =>
           `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`
         )
       : [];
