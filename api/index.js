@@ -63,11 +63,11 @@ export default async function handler(req, res) {
         }))
       : [];
 
-    // Construct full photo URLs using Google Places Photo API
+    // Generate proper photo URLs with redirect=true to get actual images
     const photos = result?.photos
       ? result.photos.map(photo => ({
           photo_reference: photo.photo_reference,
-          photo_url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo.photo_reference}&key=${apiKey}`,
+          photo_url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo.photo_reference}&key=${apiKey}&redirect=true`,
           height: photo.height,
           width: photo.width
         }))
