@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       }
     );
 
-    // Forward the Content-Type and stream the image directly to the client
+    // Forward the Content-Type and stream the image content directly
     res.setHeader('Content-Type', response.headers['content-type']);
     response.data.pipe(res);
 
