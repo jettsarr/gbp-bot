@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://gbp-data.vercel.app"
+      "url": "https://gbp-bot.vercel.app"
     }
   ],
   "paths": {
