@@ -21,7 +21,7 @@
             "in": "query",
             "required": true,
             "schema": { "type": "string" },
-            "description": "Business name to search for. Example: 'SAMBERLET RestoCafe'."
+            "description": "Business name to search for. Example: 'Starbucks New York'."
           },
           {
             "name": "api_key",
@@ -67,6 +67,7 @@
                         "type": "object",
                         "properties": {
                           "photo_reference": { "type": "string" },
+                          "photo_url": { "type": "string" },
                           "height": { "type": "integer" },
                           "width": { "type": "integer" }
                         }
