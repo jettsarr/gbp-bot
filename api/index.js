@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing `business_name` parameter.' });
     }
 
-    // Step 1: Get Place ID
+    // Step 1: Get Place ID (with location bias for better accuracy)
     const findPlaceResponse = await axios.get(
       'https://maps.googleapis.com/maps/api/place/findplacefromtext/json',
       {
@@ -21,7 +21,8 @@ export default async function handler(req, res) {
           key: apiKey,
           input: businessName,
           inputtype: 'textquery',
-          fields: 'place_id'
+          fields: 'place_id',
+          locationbias: 'circle:50000@40.7128,-74.0060' // Bias to New York as an example; adjust as needed
         }
       }
     );
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
 
     const placeId = candidates[0].place_id;
 
-    // Step 2: Get Detailed Info
+    // Step 2: Get Detailed Business Info
     const detailsResponse = await axios.get(
       'https://maps.googleapis.com/maps/api/place/details/json',
       {
@@ -47,25 +48,29 @@ export default async function handler(req, res) {
 
     const result = detailsResponse.data.result;
 
-    // Flatten reviews to plain text
+    // Flatten Reviews (Latest 5)
     const reviews = result?.reviews
-      ? result.reviews.slice(0, 5).map(review => `${review.author_name}: ${review.text} (${review.rating}⭐ - ${review.relative_time_description})`)
+      ? result.reviews.slice(0, 5).map(review =>
+          `${review.author_name}: ${review.text} (${review.rating}⭐ - ${review.relative_time_description})`
+        )
       : [];
 
-    // Flatten photos to direct URLs
+    // Flatten Photos to Simple Direct URLs via Proxy
     const photos = result?.photos
-      ? result.photos.map(photo => `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`)
+      ? result.photos.map(photo =>
+          `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`
+        )
       : [];
 
-    // Flatten opening hours text
+    // Flatten Opening Hours Text
     const openingHours = result?.opening_hours?.weekday_text
       ? result.opening_hours.weekday_text.join(' | ')
       : null;
 
+    // Return Flattened and ChatGPT-Compatible Fields
     return res.status(200).json({
-      // Using exact expected keys ChatGPT Actions looks for:
       name: result?.name || null,
-      address: result?.formatted_address || null,  // Changed from formatted_address to address
+      address: result?.formatted_address || null,
       place_id: result?.place_id || null,
       rating: result?.rating || null,
       user_ratings_total: result?.user_ratings_total || null,
@@ -74,8 +79,8 @@ export default async function handler(req, res) {
       business_status: result?.business_status || null,
       opening_hours: openingHours,
       google_maps_url: result?.url || null,
-      reviews: reviews,        // Array of plain text reviews
-      media: photos            // Changed from photos to media (ChatGPT might expect 'media')
+      reviews: reviews,  // Array of simple review strings
+      media: photos      // Array of direct image URLs (renamed to 'media' for compatibility)
     });
 
   } catch (error) {
