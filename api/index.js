@@ -6,15 +6,11 @@ export default async function handler(req, res) {
     const businessName = req.query.business_name;
 
     if (!apiKey) {
-      return res.status(500).json({
-        error: 'Missing API Key. Provide via environment variable or query parameter `api_key`.'
-      });
+      return res.status(500).json({ error: 'Missing API Key.' });
     }
 
     if (!businessName) {
-      return res.status(400).json({
-        error: 'Missing required `business_name` parameter.'
-      });
+      return res.status(400).json({ error: 'Missing `business_name` parameter.' });
     }
 
     // Step 1: Get Place ID
@@ -32,14 +28,12 @@ export default async function handler(req, res) {
 
     const candidates = findPlaceResponse.data.candidates;
     if (!candidates || candidates.length === 0) {
-      return res.status(404).json({
-        error: `No matching business found for: ${businessName}`
-      });
+      return res.status(404).json({ error: `No matching business found for: ${businessName}` });
     }
 
     const placeId = candidates[0].place_id;
 
-    // Step 2: Get Detailed Business Info
+    // Step 2: Get Detailed Info
     const detailsResponse = await axios.get(
       'https://maps.googleapis.com/maps/api/place/details/json',
       {
@@ -53,28 +47,25 @@ export default async function handler(req, res) {
 
     const result = detailsResponse.data.result;
 
-    // Flatten Reviews (Up to 5)
+    // Flatten reviews to plain text
     const reviews = result?.reviews
-      ? result.reviews.slice(0, 5).map(review => 
-          `${review.author_name}: ${review.text} (${review.rating}⭐ - ${review.relative_time_description})`
-        )
+      ? result.reviews.slice(0, 5).map(review => `${review.author_name}: ${review.text} (${review.rating}⭐ - ${review.relative_time_description})`)
       : [];
 
-    // Flatten Photos to Simple URLs Using Proxy
+    // Flatten photos to direct URLs
     const photos = result?.photos
-      ? result.photos.map(photo => 
-          `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`
-        )
+      ? result.photos.map(photo => `https://gbp-bot.vercel.app/api/photo-proxy?photo_reference=${photo.photo_reference}`)
       : [];
 
-    // Flatten Opening Hours (Optional)
-    const openingHours = result?.opening_hours?.weekday_text 
+    // Flatten opening hours text
+    const openingHours = result?.opening_hours?.weekday_text
       ? result.opening_hours.weekday_text.join(' | ')
       : null;
 
     return res.status(200).json({
+      // Using exact expected keys ChatGPT Actions looks for:
       name: result?.name || null,
-      formatted_address: result?.formatted_address || null,
+      address: result?.formatted_address || null,  // Changed from formatted_address to address
       place_id: result?.place_id || null,
       rating: result?.rating || null,
       user_ratings_total: result?.user_ratings_total || null,
@@ -83,15 +74,12 @@ export default async function handler(req, res) {
       business_status: result?.business_status || null,
       opening_hours: openingHours,
       google_maps_url: result?.url || null,
-      reviews: reviews,        // Simple array of review strings
-      photos: photos           // Simple array of direct image URLs
+      reviews: reviews,        // Array of plain text reviews
+      media: photos            // Changed from photos to media (ChatGPT might expect 'media')
     });
 
   } catch (error) {
     console.error('API Error:', error.message);
-    return res.status(500).json({
-      error: 'Internal Server Error',
-      details: error.message
-    });
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 }
