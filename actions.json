@@ -1,0 +1,87 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Google Places Dynamic API with Reviews and Photos",
+    "description": "Retrieve real business details, including latest reviews and photos, from Google Places API.",
+    "version": "1.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://gbp-data.vercel.app"
+    }
+  ],
+  "paths": {
+    "/api": {
+      "get": {
+        "operationId": "getBusinessDetails",
+        "summary": "Get real business details by providing a business name.",
+        "parameters": [
+          {
+            "name": "business_name",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Business name to search for. Example: 'SAMBERLET RestoCafe'."
+          },
+          {
+            "name": "api_key",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Optional API key if not set in Vercel environment variables."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business details retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "formatted_address": { "type": "string" },
+                    "place_id": { "type": "string" },
+                    "rating": { "type": "number" },
+                    "user_ratings_total": { "type": "integer" },
+                    "website": { "type": "string" },
+                    "international_phone_number": { "type": "string" },
+                    "business_status": { "type": "string" },
+                    "opening_hours": { "type": "object" },
+                    "url": { "type": "string" },
+                    "reviews": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "author_name": { "type": "string" },
+                          "rating": { "type": "number" },
+                          "text": { "type": "string" },
+                          "relative_time_description": { "type": "string" }
+                        }
+                      }
+                    },
+                    "photos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "photo_reference": { "type": "string" },
+                          "height": { "type": "integer" },
+                          "width": { "type": "integer" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing required business_name parameter." },
+          "404": { "description": "No matching business found." },
+          "500": { "description": "Internal server error." }
+        }
+      }
+    }
+  }
+}
