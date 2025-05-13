@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     if (!apiKey || !photoReference) {
       return res.status(400).json({
-        error: 'Missing api_key or photo_reference parameter.'
+        error: 'Missing required `api_key` or `photo_reference` parameter.'
       });
     }
 
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       }
     );
 
-    // Set the correct headers and stream the image directly
+    // Forward the Content-Type and stream the image directly to the client
     res.setHeader('Content-Type', response.headers['content-type']);
     response.data.pipe(res);
 
