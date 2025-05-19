@@ -1,34 +1,38 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Google Places Dynamic API with Reviews and Photos",
-    "description": "Retrieve real business details, including latest reviews and photos, from Google Places API.",
-    "version": "1.1.0"
+    "title": "Google Places Dynamic API (ChatGPT Compatible with 5 Photos)",
+    "description": "Retrieve business details including up to 5 reviews and up to 5 media (photos)",
+    "version": "1.4.0"
   },
   "servers": [
     {
-      "url": "https://gbp-bot.vercel.app"
+      "url": "https://gbp-bot.jether.net"
     }
   ],
   "paths": {
     "/api": {
       "get": {
         "operationId": "getBusinessDetails",
-        "summary": "Get real business details by providing a business name.",
+        "summary": "Get business details by providing a business name.",
         "parameters": [
           {
             "name": "business_name",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" },
-            "description": "Business name to search for. Example: 'Starbucks New York'."
+            "schema": {
+              "type": "string"
+            },
+            "description": "Business name to search for. Example: 'Artisan Optics'."
           },
           {
             "name": "api_key",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
-            "description": "Optional API key if not set in Vercel environment variables."
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional API key if not set in environment variables."
           }
         ],
         "responses": {
@@ -39,48 +43,64 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "name": { "type": "string" },
-                    "formatted_address": { "type": "string" },
-                    "place_id": { "type": "string" },
-                    "rating": { "type": "number" },
-                    "user_ratings_total": { "type": "integer" },
-                    "website": { "type": "string" },
-                    "international_phone_number": { "type": "string" },
-                    "business_status": { "type": "string" },
-                    "opening_hours": { "type": "object" },
-                    "url": { "type": "string" },
+                    "name": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "place_id": {
+                      "type": "string"
+                    },
+                    "rating": {
+                      "type": "number"
+                    },
+                    "user_ratings_total": {
+                      "type": "integer"
+                    },
+                    "website": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    },
+                    "business_status": {
+                      "type": "string"
+                    },
+                    "opening_hours": {
+                      "type": "string"
+                    },
+                    "google_maps_url": {
+                      "type": "string"
+                    },
                     "reviews": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "author_name": { "type": "string" },
-                          "rating": { "type": "number" },
-                          "text": { "type": "string" },
-                          "relative_time_description": { "type": "string" }
-                        }
-                      }
+                        "type": "string"
+                      },
+                      "description": "Up to 5 latest reviews as plain text."
                     },
-                    "photos": {
+                    "media": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "photo_reference": { "type": "string" },
-                          "photo_url": { "type": "string" },
-                          "height": { "type": "integer" },
-                          "width": { "type": "integer" }
-                        }
-                      }
+                        "type": "string"
+                      },
+                      "description": "Up to 5 direct image URLs."
                     }
                   }
                 }
               }
             }
           },
-          "400": { "description": "Missing required business_name parameter." },
-          "404": { "description": "No matching business found." },
-          "500": { "description": "Internal server error." }
+          "400": {
+            "description": "Missing required business_name parameter."
+          },
+          "404": {
+            "description": "No matching business found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
         }
       }
     }
